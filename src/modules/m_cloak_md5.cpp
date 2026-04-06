@@ -4,7 +4,7 @@
  *   Copyright (C) 2019 Dylan Frank <b00mx0r@aureus.pw>
  *   Copyright (C) 2017 Sheogorath <sheogorath@shivering-isles.com>
  *   Copyright (C) 2016 Adam <Adam@anope.org>
- *   Copyright (C) 2013, 2017-2019, 2021-2025 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2013, 2017-2019, 2021-2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
  *   Copyright (C) 2008 Robin Burchell <robin+git@viroteck.net>
@@ -323,7 +323,7 @@ private:
 
 public:
 	ModuleCloakMD5()
-		: Module(VF_VENDOR, "Adds the half and full cloaking methods for use with the cloak module.")
+		: Module(VF_VENDOR | VF_DEPRECATED, "Adds the half and full cloaking methods for use with the cloak module.")
 		, halfcloak(this, "half", MODE_HALF_CLOAK)
 		, fullcloak(this, "full", MODE_OPAQUE)
 	{

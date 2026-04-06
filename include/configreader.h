@@ -3,7 +3,7 @@
  *
  *   Copyright (C) 2018 Chris Novakovic
  *   Copyright (C) 2013-2014 Attila Molnar <attilamolnar@hush.com>
- *   Copyright (C) 2012-2014, 2016-2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2012-2014, 2016-2024, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
  *   Copyright (C) 2008 Thomas Stagner <aquanight@gmail.com>
@@ -355,6 +355,9 @@ public:
 
 		/** Maximum hostname length */
 		size_t MaxHost;
+
+		/** Maximum key length */
+		size_t MaxKey;
 
 		/** Read all limits from a config tag. Limits which aren't specified in the tag are set to a default value.
 		 * @param tag Configuration tag to read the limits from

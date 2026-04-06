@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2019-2023 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2019-2023, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2014 Adam <Adam@anope.org>
  *   Copyright (C) 2013, 2016 Attila Molnar <attilamolnar@hush.com>
  *
@@ -114,7 +114,7 @@ private:
 
 public:
 	ModuleStartTLS()
-		: Module(VF_VENDOR, "Provides the IRCv3 tls client capability.")
+		: Module(VF_VENDOR | VF_DEPRECATED, "Provides the IRCv3 tls client capability.")
 		, starttls(this, ssl)
 		, tls(this, ssl)
 		, ssl(this, "ssl")

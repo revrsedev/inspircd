@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2020-2025 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2020-2026 Sadie Powell <sadie@witchery.services>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -99,6 +99,7 @@ void ISupportManager::Build()
 		{ "CHANNELLEN",  ConvToStr(ServerInstance->Config->Limits.MaxChannel) },
 		{ "CHANTYPES",   "#"                                                  },
 		{ "HOSTLEN",     ConvToStr(ServerInstance->Config->Limits.MaxHost)    },
+		{ "KEYLEN",      ConvToStr(ServerInstance->Config->Limits.MaxKey)     },
 		{ "KICKLEN",     ConvToStr(ServerInstance->Config->Limits.MaxKick)    },
 		{ "LINELEN",     ConvToStr(ServerInstance->Config->Limits.MaxLine)    },
 		{ "MAXTARGETS",  ConvToStr(ServerInstance->Config->MaxTargets)        },

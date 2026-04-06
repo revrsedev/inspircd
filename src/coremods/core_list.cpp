@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2017-2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2017-2024, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2015 Daniel Vassdal <shutter@canternet.org>
  *   Copyright (C) 2013-2016 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
@@ -212,7 +212,7 @@ public:
 	void ReadConfig(ConfigStatus& status) override
 	{
 		const auto& tag = ServerInstance->Config->ConfValue("options");
-		cmd.showmodes = tag->getEnum("showmodes", ShowModes::OPERS, {
+		cmd.showmodes = tag->getEnum("modesinlist", ShowModes::OPERS, {
 			{ "no",    ShowModes::NOBODY },
 			{ "opers", ShowModes::OPERS  },
 			{ "yes",   ShowModes::ALL    },

@@ -2,12 +2,11 @@
  * InspIRCd -- Internet Relay Chat Daemon
  *
  *   Copyright (C) 2021 Val Lorentz <progval+git@progval.net>
- *   Copyright (C) 2018-2022 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2018-2022, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2018 Dylan Frank <b00mx0r@aureus.pw>
  *   Copyright (C) 2013-2016 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009 Daniel De Graaf <danieldg@inspircd.org>
- *   Copyright (C) 2007 Robin Burchell <robin+git@viroteck.net>
  *   Copyright (C) 2007 Dennis Friis <peavey@inspircd.org>
  *   Copyright (C) 2006, 2008 Craig Edwards <brain@inspircd.org>
  *
@@ -31,13 +30,6 @@
 
 #include "core_channel.h"
 
-enum
-{
-	// From RFC 1459.
-	RPL_NAMREPLY = 353,
-	RPL_ENDOFNAMES = 366,
-};
-
 CommandNames::CommandNames(Module* parent)
 	: SplitCommand(parent, "NAMES")
 	, secretmode(parent, "secret")
@@ -50,8 +42,6 @@ CommandNames::CommandNames(Module* parent)
 
 CmdResult CommandNames::HandleLocal(LocalUser* user, const Params& parameters)
 {
-	Channel* c;
-
 	if (parameters.empty())
 	{
 		user->WriteNumeric(RPL_ENDOFNAMES, '*', "End of /NAMES list.");
@@ -59,9 +49,12 @@ CmdResult CommandNames::HandleLocal(LocalUser* user, const Params& parameters)
 	}
 
 	if (CommandParser::LoopCall(user, this, parameters, 0))
+	{
+		user->WriteNumeric(RPL_ENDOFNAMES, parameters[0], "End of /NAMES list.");
 		return CmdResult::SUCCESS;
+	}
 
-	c = ServerInstance->Channels.Find(parameters[0]);
+	auto* c = ServerInstance->Channels.Find(parameters[0]);
 	if (c)
 	{
 		// Show the NAMES list if one of the following is true:
@@ -72,14 +65,12 @@ CmdResult CommandNames::HandleLocal(LocalUser* user, const Params& parameters)
 		// If the user is inside the channel or has privs, instruct SendNames() to show invisible (+i) members
 		bool show_invisible = ((c->HasUser(user)) || (user->HasPrivPermission("channels/auspex")));
 		if ((show_invisible) || (!c->IsModeSet(secretmode)))
-		{
 			SendNames(user, c, show_invisible);
-			return CmdResult::SUCCESS;
-		}
 	}
 
-	user->WriteNumeric(RPL_ENDOFNAMES, parameters[0], "End of /NAMES list.");
-	return CmdResult::FAILURE;
+	if (!this->loopcall)
+		user->WriteNumeric(RPL_ENDOFNAMES, parameters[0], "End of /NAMES list.");
+	return c ? CmdResult::SUCCESS : CmdResult::FAILURE;
 }
 
 void CommandNames::SendNames(LocalUser* user, Channel* chan, bool show_invisible)
@@ -118,5 +109,4 @@ void CommandNames::SendNames(LocalUser* user, Channel* chan, bool show_invisible
 	}
 
 	reply.Flush();
-	user->WriteNumeric(RPL_ENDOFNAMES, chan->name, "End of /NAMES list.");
 }

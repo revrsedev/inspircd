@@ -2,7 +2,7 @@
  * InspIRCd -- Internet Relay Chat Daemon
  *
  *   Copyright (C) 2012-2016, 2018 Attila Molnar <attilamolnar@hush.com>
- *   Copyright (C) 2012-2013, 2017-2025 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2012-2013, 2017-2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2012 ChrisTX <xpipe@hotmail.de>
  *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
@@ -421,7 +421,7 @@ public:
 	static void ProcessColors(std::vector<std::string>& lines);
 
 	/** Replaces color escapes in the specified string with IRC colors.
-	 * @param lines The string replace color escapes in.
+	 * @param str The string to replace color escapes in.
 	 */
 	static void ProcessColors(std::string& str);
 

@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2017, 2020-2022, 2024-2025 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2017, 2020-2022, 2024-2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2014, 2016 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009 Uli Schlachter <psychon@znc.in>
@@ -46,25 +46,10 @@ CmdResult CommandCommands::HandleLocal(LocalUser* user, const Params& parameters
 	const auto has_auspex = user->HasPrivPermission("servers/auspex");
 	for (const auto& [_, command] : ServerInstance->Parser.GetCommands())
 	{
-		// Don't show privileged commands to users without the privilege.
-		bool usable = true;
-		switch (command->access_needed)
-		{
-			case CmdAccess::NORMAL: // Everyone can use user commands.
-				break;
-
-			case CmdAccess::OPERATOR: // Only opers can use oper commands.
-				usable = user->HasCommandPermission(command->name);
-				break;
-
-			case CmdAccess::SERVER: // Nobody can use server commands.
-				usable = false;
-				break;
-		}
-
 		// Only send this command to the user if:
 		// 1. It is usable by the caller.
 		// 2. The caller has the servers/auspex priv.
+		const auto usable = command->IsUsableBy(user);
 		if (!usable && !has_auspex)
 			continue;
 

@@ -2,7 +2,7 @@
  * InspIRCd -- Internet Relay Chat Daemon
  *
  *   Copyright (C) 2012-2015, 2018 Attila Molnar <attilamolnar@hush.com>
- *   Copyright (C) 2012-2013, 2017-2022 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2012-2013, 2017-2022, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009 Daniel De Graaf <danieldg@inspircd.org>
  *   Copyright (C) 2008 Thomas Stagner <aquanight@gmail.com>
@@ -254,6 +254,9 @@ public:
 	/** Whether the command can be issued before registering. */
 	bool works_before_reg = false;
 
+	/** Whether the command is currently being loopcalled. */
+	bool loopcall = false;
+
 	/** Handle the command from a user.
 	 * @param user The user who issued the command.
 	 * @param parameters The parameters for the command.
@@ -261,6 +264,11 @@ public:
 	 *         if the command was malformed.
 	 */
 	virtual CmdResult Handle(User* user, const Params& parameters) = 0;
+
+	/** Determines if this command is usable by the specified.
+	 * @param user The user to check.
+	 */
+	bool IsUsableBy(User* user) const;
 
 	/** Registers this command with the command parser. */
 	void RegisterService() override;

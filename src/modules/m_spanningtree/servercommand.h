@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2018-2019, 2021-2022 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2018-2019, 2021-2022, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2013-2015 Attila Molnar <attilamolnar@hush.com>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
@@ -100,7 +100,7 @@ public:
 
 class ServerCommandManager final
 {
-	typedef std::unordered_map<std::string, ServerCommand*> ServerCommandMap;
+	using ServerCommandMap = std::unordered_map<std::string, ServerCommand*, irc::insensitive, irc::StrHashComp>;
 	ServerCommandMap commands;
 
 public:

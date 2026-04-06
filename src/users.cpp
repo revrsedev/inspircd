@@ -4,7 +4,7 @@
  *   Copyright (C) 2019 linuxdaemon <linuxdaemon.irc@gmail.com>
  *   Copyright (C) 2018 systocrat <systocrat@outlook.com>
  *   Copyright (C) 2018 Dylan Frank <b00mx0r@aureus.pw>
- *   Copyright (C) 2013, 2017-2025 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2013, 2017-2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2013 Adam <Adam@anope.org>
  *   Copyright (C) 2012-2016, 2018 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
@@ -451,7 +451,6 @@ bool LocalUser::CheckLines(bool doZline)
 
 void LocalUser::FullConnect()
 {
-	ServerInstance->Stats.Connects++;
 	this->idle_lastmsg = ServerInstance->Time();
 
 	/*
@@ -474,6 +473,7 @@ void LocalUser::FullConnect()
 	FOREACH_MOD(OnUserConnect, (this));
 
 	// The user is now fully connected.
+	ServerInstance->Stats.Connects++;
 	if (ServerInstance->Users.unknown_count)
 		ServerInstance->Users.unknown_count--;
 	this->connected = CONN_FULL;

@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2013, 2019-2023 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2013, 2019-2023, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009 Daniel De Graaf <danieldg@inspircd.org>
  *   Copyright (C) 2006 Craig Edwards <brain@inspircd.org>
@@ -58,7 +58,7 @@ private:
 
 public:
 	ModuleMD5()
-		: Module(VF_VENDOR, "Allows other modules to generate MD5 hashes.")
+		: Module(VF_VENDOR | VF_DEPRECATED, "Allows other modules to generate MD5 hashes.")
 		, md5(this)
 	{
 	}

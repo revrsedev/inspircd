@@ -2,7 +2,7 @@
  * InspIRCd -- Internet Relay Chat Daemon
  *
  *   Copyright (C) 2021 Herman <GermanAizek@yandex.ru>
- *   Copyright (C) 2018-2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2018-2024, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2012-2016, 2018 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
@@ -61,6 +61,7 @@ bool CommandParser::LoopCall(User* user, Command* handler, const CommandBase::Pa
 	 * for every parameter or parameter pair until there are no more
 	 * left to parse.
 	 */
+	handler->loopcall = true;
 	CommandBase::Params splitparams(parameters);
 	while (items1.GetToken(item) && (!usemax || max++ < ServerInstance->Config->MaxTargets))
 	{
@@ -86,6 +87,7 @@ bool CommandParser::LoopCall(User* user, Command* handler, const CommandBase::Pa
 			}
 		}
 	}
+	handler->loopcall = false;
 
 	return true;
 }
@@ -112,29 +114,9 @@ CmdResult CommandParser::CallHandler(const std::string& commandname, const Comma
 
 		if (parameters.size() >= handler->min_params)
 		{
-			bool bOkay = false;
+			bool bOkay = true;
 			if (IS_LOCAL(user))
-			{
-				switch (handler->access_needed)
-				{
-					case CmdAccess::NORMAL: // Anyone can execute.
-						bOkay = true;
-						break;
-
-					case CmdAccess::OPERATOR: // Only opers can execute.
-						bOkay = user->HasCommandPermission(commandname);
-						break;
-
-					case CmdAccess::SERVER: // Only servers can execute.
-						bOkay = IS_SERVER(user);
-						break;
-				}
-			}
-			else
-			{
-				/* remote or no flags required anyway */
-				bOkay = true;
-			}
+				bOkay = handler->IsUsableBy(user);
 
 			if (bOkay)
 			{
@@ -436,6 +418,22 @@ void Command::RegisterService()
 {
 	if (!ServerInstance->Parser.AddCommand(this))
 		throw ModuleException(creator, "Command already exists: " + name);
+}
+
+bool Command::IsUsableBy(User *user) const
+{
+	switch (this->access_needed)
+	{
+		case CmdAccess::NORMAL: // Everyone can use user commands.
+			return true;
+
+		case CmdAccess::OPERATOR: // Only opers can use oper commands.
+			return user->HasCommandPermission(this->name);
+
+		case CmdAccess::SERVER: // Only servers can use server commands.
+			return IS_SERVER(user);
+	}
+	return true; // Should never happen.
 }
 
 void Command::TellNotEnoughParameters(LocalUser* user, const Params& parameters)

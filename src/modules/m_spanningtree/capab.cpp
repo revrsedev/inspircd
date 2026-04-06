@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2017-2025 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2017-2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2013-2016 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
@@ -346,6 +346,7 @@ void TreeSocket::SendCapabilities(int phase)
 		{ "MAXAWAY",     ConvToStr(ServerInstance->Config->Limits.MaxAway)    },
 		{ "MAXCHANNEL",  ConvToStr(ServerInstance->Config->Limits.MaxChannel) },
 		{ "MAXHOST",     ConvToStr(ServerInstance->Config->Limits.MaxHost)    },
+		{ "MAXKEY",      ConvToStr(ServerInstance->Config->Limits.MaxKey)     },
 		{ "MAXKICK",     ConvToStr(ServerInstance->Config->Limits.MaxKick)    },
 		{ "MAXLINE",     ConvToStr(ServerInstance->Config->Limits.MaxLine)    },
 		{ "MAXMODES",    ConvToStr(ServerInstance->Config->Limits.MaxModes)   },

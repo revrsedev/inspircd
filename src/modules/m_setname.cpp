@@ -2,7 +2,7 @@
  * InspIRCd -- Internet Relay Chat Daemon
  *
  *   Copyright (C) 2022 delthas
- *   Copyright (C) 2018-2023 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2018-2023, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2012 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2009 Daniel De Graaf <danieldg@inspircd.org>
@@ -51,6 +51,24 @@ public:
 		{
 			fail.SendIfCap(user, &cap, this, "INVALID_REALNAME", "Real name is too long");
 			return CmdResult::FAILURE;
+		}
+
+		// Disallow the real name change if <security:restrictbannedusers> is on and there is a ban
+		// matching this user in one of the channels they are on.
+		if (ServerInstance->Config->RestrictBannedUsers != ServerConfig::BUT_NORMAL)
+		{
+			for (const auto* memb : user->chans)
+			{
+				if (memb->chan->GetPrefixValue(user) < VOICE_VALUE && memb->chan->IsBanned(user))
+				{
+					if (ServerInstance->Config->RestrictBannedUsers == ServerConfig::BUT_RESTRICT_NOTIFY)
+					{
+						fail.SendIfCap(user, &cap, this, "CANNOT_CHANGE_REALNAME", INSP_FORMAT("Cannot change nickname while on {} (you're banned)",
+							memb->chan->name));
+					}
+					return CmdResult::FAILURE;
+				}
+			}
 		}
 
 		user->ChangeRealName(parameters[0]);

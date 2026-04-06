@@ -2,7 +2,7 @@
  * InspIRCd -- Internet Relay Chat Daemon
  *
  *   Copyright (C) 2013-2016 Attila Molnar <attilamolnar@hush.com>
- *   Copyright (C) 2013-2014, 2016-2025 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2013-2014, 2016-2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2012 ChrisTX <xpipe@hotmail.de>
  *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
@@ -53,6 +53,7 @@ ServerConfig::ServerLimits::ServerLimits(const std::shared_ptr<ConfigTag>& tag)
 	, MaxReal(tag->getNum<size_t>("maxreal", 130, 1, MaxLine))
 	, MaxAway(tag->getNum<size_t>("maxaway", 200, 1, MaxLine))
 	, MaxHost(tag->getNum<size_t>("maxhost", 64, 45, MaxLine))
+	, MaxKey(tag->getNum<size_t>("maxkey", 32, 1, ModeParser::MODE_PARAM_MAX))
 {
 }
 

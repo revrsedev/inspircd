@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2018-2023 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2018-2023, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2014 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
@@ -54,9 +54,9 @@ public:
 		std::string foundcommand;
 		std::string matchlist;
 		bool foundmatch = false;
-		for (const auto& [cmdname, _] : ServerInstance->Parser.GetCommands())
+		for (const auto& [cmdname, cmd] : ServerInstance->Parser.GetCommands())
 		{
-			if (!command.compare(0, clen, cmdname, 0, clen))
+			if (!command.compare(0, clen, cmdname, 0, clen) && cmd->IsUsableBy(user))
 			{
 				if (matchlist.length() > 450)
 				{

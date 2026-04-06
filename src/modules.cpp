@@ -2,7 +2,7 @@
  * InspIRCd -- Internet Relay Chat Daemon
  *
  *   Copyright (C) 2019 iwalkalone <iwalkalone69@gmail.com>
- *   Copyright (C) 2017-2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2017-2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2013 Daniel Vassdal <shutter@canternet.org>
  *   Copyright (C) 2013 Adam <Adam@anope.org>
  *   Copyright (C) 2012-2016, 2018 Attila Molnar <attilamolnar@hush.com>
@@ -77,13 +77,14 @@ void Module::CompareLinkData(const LinkData& otherdata, LinkDataDiff& diffs)
 
 std::string Module::GetPropertyString() const
 {
-	// D = VF_CORE ("default")
+	// R = VF_CORE ("required")
 	// V = VF_VENDOR
 	// C = VF_COMMON
 	// O = VF_OPTCOMMON
-	std::string propstr("DVCO");
+	// D = VF_DEPRECATED
+	std::string propstr("RVCOD");
 	size_t pos = 0;
-	for (int mult = VF_CORE; mult <= VF_OPTCOMMON; mult *= 2, ++pos)
+	for (int mult = VF_CORE; mult <= VF_LAST; mult *= 2, ++pos)
 		if (!(this->properties & mult))
 			propstr[pos] = '-';
 	return propstr;
@@ -726,6 +727,12 @@ dynamic_reference_base::dynamic_reference_base(Module* Creator, const std::strin
 	// Resolve unless there is no ModuleManager (part of class InspIRCd)
 	if (ServerInstance)
 		resolve();
+}
+
+dynamic_reference_base::dynamic_reference_base(const dynamic_reference_base& other)
+	: dynamic_reference_base(other.creator, other.name)
+{
+	// Intentionally left blank.
 }
 
 dynamic_reference_base::~dynamic_reference_base()

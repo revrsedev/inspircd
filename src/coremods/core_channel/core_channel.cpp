@@ -4,7 +4,7 @@
  *   Copyright (C) 2019 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2018 linuxdaemon <linuxdaemon.irc@gmail.com>
  *   Copyright (C) 2018 Dylan Frank <b00mx0r@aureus.pw>
- *   Copyright (C) 2017-2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2017-2024, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2014-2015, 2018 Attila Molnar <attilamolnar@hush.com>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
@@ -214,14 +214,10 @@ public:
 			ServerInstance->Modules.Attach(events, this, sizeof(events)/sizeof(Implementation));
 		else
 			ServerInstance->Modules.Detach(events, this, sizeof(events)/sizeof(Implementation));
-
-		const auto& limitstag = ServerInstance->Config->ConfValue("limits");
-		keymode.maxkeylen = limitstag->getNum<size_t>("maxkey", 32, 1, ModeParser::MODE_PARAM_MAX);
 	}
 
 	void OnBuildISupport(ISupport::TokenMap& tokens) override
 	{
-		tokens["KEYLEN"] = ConvToStr(keymode.maxkeylen);
 		extbanmgr.BuildISupport(tokens["EXTBAN"]);
 
 		std::vector<std::string> limits;
@@ -334,6 +330,7 @@ public:
 
 			// Show all members of the channel, including invisible (+i) users
 			cmdnames.SendNames(localuser, chan, true);
+			localuser->WriteNumeric(RPL_ENDOFNAMES, chan->name, "End of /NAMES list.");
 		}
 	}
 

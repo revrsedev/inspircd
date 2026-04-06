@@ -2,7 +2,7 @@
  * InspIRCd -- Internet Relay Chat Daemon
  *
  *   Copyright (C) 2019 linuxdaemon <linuxdaemon.irc@gmail.com>
- *   Copyright (C) 2018-2025 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2018-2026 Sadie Powell <sadie@witchery.services>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -23,6 +23,18 @@
 #include "modules/ctctags.h"
 #include "modules/isupport.h"
 #include "numerichelper.h"
+
+enum class AllowTags
+{
+	// No client tags are allowed.
+	NONE,
+
+	// Only known client tags are allowed.
+	KNOWN,
+
+	// All client tags are allowed.
+	ALL,
+};
 
 class CommandTagMsg final
 	: public Command
@@ -279,8 +291,53 @@ class C2CTags final
 private:
 	Cap::Capability& cap;
 
+	static bool ValidateChannel(LocalUser* user, const std::string& tagvalue)
+	{
+		for (const auto* memb : user->chans)
+		{
+			if (irc::equals(memb->chan->name, tagvalue))
+				return true;
+		}
+		return false;
+	}
+
+	static bool ValidateMessageId(LocalUser* user, const std::string& tagvalue)
+	{
+		// Message IDs MUST NOT start with a colon (:) and MUST NOT contain any
+		// of SPACE, CR, LF.
+		return !tagvalue.empty()
+			&& tagvalue[0] != ':'
+			&& tagvalue.find_first_of(" \n\r") != std::string::npos;
+	}
+
+	static bool ValidateReaction(LocalUser* user, const std::string& tagvalue)
+	{
+		return !tagvalue.empty()
+			&& tagvalue.length() <= 50;
+	}
+
+	static bool ValidateTyping(LocalUser* user, const std::string& tagvalue)
+	{
+		//  A typing notification is represented by a TAGMSG command sent with a
+		// typing tag using the client-only prefix + and possible values of
+		// active, paused, and done.
+		return irc::equals(tagvalue, "active")
+			|| irc::equals(tagvalue, "paused")
+			|| irc::equals(tagvalue, "done");
+	}
+
 public:
-	bool allowclientonlytags;
+	AllowTags clientonlytags;
+	insp::flat_map<std::string, std::function<bool(LocalUser*, const std::string&)>, irc::insensitive_swo> knowntags = {
+		{ "+draft/channel-context", ValidateChannel   }, // https://ircv3.net/specs/client-tags/channel-context
+		{ "+draft/react",           ValidateReaction  }, // https://ircv3.net/specs/client-tags/react
+		{ "+draft/reply",           ValidateMessageId }, // https://ircv3.net/specs/client-tags/reply
+		{ "+draft/unreact",         ValidateReaction  }, // https://ircv3.net/specs/client-tags/react
+
+		{ "+reply",                 ValidateMessageId }, // https://ircv3.net/specs/client-tags/reply
+		{ "+typing",                ValidateTyping    }, // https://ircv3.net/specs/client-tags/typing
+	};
+
 	C2CTags(Module* Creator, Cap::Capability& Cap)
 		: ClientProtocol::MessageTagProvider(Creator)
 		, cap(Cap)
@@ -291,14 +348,24 @@ public:
 	{
 		// A client-only tag is prefixed with a plus sign (+) and otherwise conforms
 		// to the format specified in IRCv3.2 tags.
-		if (tagname[0] != '+' || tagname.length() < 2 || !allowclientonlytags)
+		if (tagname[0] != '+' || tagname.length() < 2 || clientonlytags == AllowTags::NONE)
 			return MOD_RES_PASSTHRU;
 
 		// If the user is local then we check whether they have the message-tags cap
 		// enabled. If not then we reject all client-only tags originating from them.
-		LocalUser* lu = IS_LOCAL(user);
-		if (lu && !cap.IsEnabled(lu))
-			return MOD_RES_DENY;
+		auto* lu = IS_LOCAL(user);
+		if (lu)
+		{
+			if (!cap.IsEnabled(lu))
+				return MOD_RES_DENY; // Cap not enabled.
+
+			if (clientonlytags == AllowTags::KNOWN)
+			{
+				auto it = knowntags.find(tagname);
+				if (it == knowntags.end() || !it->second(lu, tagvalue))
+					return MOD_RES_DENY; // Tag not whitelisted.
+			}
+		}
 
 		// Remote users have their client-only tags checked by their local server.
 		return MOD_RES_ALLOW;
@@ -348,13 +415,33 @@ public:
 
 	void ReadConfig(ConfigStatus& status) override
 	{
-		c2ctags.allowclientonlytags = ServerInstance->Config->ConfValue("ctctags")->getBool("allowclientonlytags", true);
+		const auto& tag = ServerInstance->Config->ConfValue("ctctags");
+
+		const auto allowclientonlytags = tag->getBool("allowclientonlytags", true);
+		c2ctags.clientonlytags = tag->getEnum("clientonlytags", allowclientonlytags ? AllowTags::ALL : AllowTags::NONE, {
+			{"all",   AllowTags::ALL   },
+			{"known", AllowTags::KNOWN },
+			{"none",  AllowTags::NONE  },
+		});
 	}
 
 	void OnBuildISupport(ISupport::TokenMap& tokens) override
 	{
-		if (!c2ctags.allowclientonlytags)
-			tokens["CLIENTTAGDENY"] = "*";
+		switch (c2ctags.clientonlytags)
+		{
+			case AllowTags::NONE:
+				tokens["CLIENTTAGDENY"] = "*";
+				break;
+			case AllowTags::KNOWN:
+			{
+				auto& token = tokens["CLIENTTAGDENY"] = "*";
+				for (const auto& [tag, _] : c2ctags.knowntags)
+					token.append(",-").append(tag, 1, std::string::npos);
+				break;
+			}
+			case AllowTags::ALL:
+				break;
+		}
 	}
 
 	ModResult OnUserPreMessage(User* user, MessageTarget& target, MessageDetails& details) override

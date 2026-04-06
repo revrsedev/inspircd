@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2013, 2015, 2019-2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2013, 2015, 2019-2024, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2013 Adam <Adam@anope.org>
  *   Copyright (C) 2012-2013, 2015 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
@@ -84,6 +84,12 @@ bool ModuleManager::Load(const std::string& modname, bool defer)
 
 			ServerInstance->Logs.Normal("MODULE", "New module introduced: {} (version {}, properties {})",
 				filename, newmod->GetVersion(), newmod->GetPropertyString());
+
+			if (newmod->properties & VF_DEPRECATED)
+			{
+				ServerInstance->Logs.Warning("MODULE", "The {} module is deprecated and will be removed in the next version of InspIRCd!",
+					ModuleManager::ShrinkModName(filename));
+			}
 		}
 		else
 		{

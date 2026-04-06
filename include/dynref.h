@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2019-2023 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2019-2023, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2013, 2015 Attila Molnar <attilamolnar@hush.com>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
@@ -45,7 +45,7 @@ protected:
 public:
 	ModuleRef creator;
 	dynamic_reference_base(Module* Creator, const std::string& Name);
-	dynamic_reference_base(const dynamic_reference_base&) = default;
+	dynamic_reference_base(const dynamic_reference_base& other);
 	~dynamic_reference_base();
 
 	dynamic_reference_base& operator=(const dynamic_reference_base& rhs)

@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2023-2025 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2023-2026 Sadie Powell <sadie@witchery.services>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -57,7 +57,6 @@ private:
 	HelpOp helpop;
 	UserModeReference hideoper;
 	bool markhelpers;
-	std::string helpchanmodes;
 	insp::flat_map<std::string, std::string> helpchans;
 
 public:
@@ -72,6 +71,7 @@ public:
 
 	void ReadConfig(ConfigStatus& status) override
 	{
+		helpchans.clear();
 		for (const auto& [_, tag] : ServerInstance->Config->ConfTags("helpchan"))
 		{
 			const auto name = tag->getString("name");

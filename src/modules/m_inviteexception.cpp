@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2017-2023 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2017-2023, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2012-2013 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
@@ -60,8 +60,13 @@ public:
 
 	bool ValidateParam(LocalUser* user, Channel* channel, std::string& parameter) override
 	{
-		if (!extbanmgr || !extbanmgr->Canonicalize(parameter))
-			ModeParser::CleanMask(parameter);
+		if (extbanmgr)
+		{
+			const auto valid = extbanmgr->Validate(this, user, channel, parameter);
+			if (valid != ExtBan::Comparison::NOT_AN_EXTBAN)
+				return valid == ExtBan::Comparison::MATCH;
+		}
+		ModeParser::CleanMask(parameter);
 		return true;
 	}
 };

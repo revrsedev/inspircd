@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2017, 2019-2023 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2017, 2019-2023, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2014 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009 Uli Schlachter <psychon@znc.in>
@@ -69,8 +69,8 @@ bool ModeChannelKey::OnModeChange(User* source, User*, Channel* channel, Modes::
 			change.param.erase(commapos, 1);
 
 		// Truncate the parameter to the maximum key length.
-		if (change.param.length() > maxkeylen)
-			change.param.erase(maxkeylen);
+		if (change.param.length() > ServerInstance->Config->Limits.MaxKey)
+			change.param.erase(ServerInstance->Config->Limits.MaxKey);
 
 		// If the password is empty here then it only consisted of commas. This is not
 		// acceptable so we reject the mode change.

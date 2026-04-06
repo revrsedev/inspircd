@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2017, 2019-2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2017, 2019-2024, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2014-2015 Attila Molnar <attilamolnar@hush.com>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
@@ -24,6 +24,13 @@
 #include "listmode.h"
 #include "modules/exemption.h"
 #include "modules/extban.h"
+
+enum
+{
+	// From RFC 1459.
+	RPL_NAMREPLY = 353,
+	RPL_ENDOFNAMES = 366,
+};
 
 namespace Topic
 {
@@ -114,7 +121,6 @@ class ModeChannelKey final
 	: public ParamMode<ModeChannelKey, StringExtItem>
 {
 public:
-	std::string::size_type maxkeylen;
 	ModeChannelKey(Module* Creator);
 	bool OnModeChange(User* source, User* dest, Channel* channel, Modes::Change& change) override;
 	void SerializeParam(Channel* chan, const std::string* key, std::string& out);
@@ -175,5 +181,6 @@ public:
 	ModResult GetStatus(ExtBan::ActingBase* extban, User* user, Channel* channel) const override;
 	ExtBan::Base* FindName(const std::string& name) const override;
 	ExtBan::Base* FindLetter(ExtBan::Letter letter) const override;
+	ExtBan::Comparison Validate(ListModeBase* lm, LocalUser* user, Channel* channel, std::string& text) const override;
 	void BuildISupport(std::string& out);
 };

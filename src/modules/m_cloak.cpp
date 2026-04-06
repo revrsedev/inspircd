@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2023-2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2023-2024, 2026 Sadie Powell <sadie@witchery.services>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -33,7 +33,7 @@ private:
 	CloakMethodList& cloakmethods;
 
 	// API for sending a FAIL message.
-	IRCv3::Replies::Note failrpl;
+	IRCv3::Replies::Fail failrpl;
 
 	// API for sending a NOTE message.
 	IRCv3::Replies::Note noterpl;

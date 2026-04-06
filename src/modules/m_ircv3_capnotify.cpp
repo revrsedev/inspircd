@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2018-2022, 2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2018-2022, 2024, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2015, 2018 Attila Molnar <attilamolnar@hush.com>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
@@ -151,8 +151,8 @@ public:
 
 	void OnCapValueChange(Cap::Capability* cap) override
 	{
-		// The value of a cap has changed, send CAP DEL and CAP NEW with the new value
-		Send(cap->GetName(), cap, false);
+		// We used to send a DEL then a NEW here but IRCv3 PR #480 clarified
+		// that this behaviour is unnecessary.
 		Send(cap->GetName(), cap, true);
 	}
 

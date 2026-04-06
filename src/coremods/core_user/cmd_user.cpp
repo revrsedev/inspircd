@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2017-2018, 2020, 2022-2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2017-2018, 2020, 2022, 2024, 2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2014-2015 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009 Daniel De Graaf <danieldg@inspircd.org>
@@ -42,17 +42,19 @@ CommandUser::CommandUser(Module* parent)
 CmdResult CommandUser::HandleLocal(LocalUser* user, const Params& parameters)
 {
 	/* A user may only send the USER command once */
+	const auto& newuser = parameters[0];
+	const auto& newreal = parameters[3];
 	if (!(user->connected & User::CONN_USER))
 	{
-		if (!ServerInstance->IsUser(parameters[0]))
+		if (!ServerInstance->IsUser(newuser))
 		{
-			user->WriteNumeric(ERR_INVALIDUSERNAME, name, "Your username is not valid");
+			user->WriteNumeric(ERR_INVALIDUSERNAME, newuser, "Your username is not valid");
 			return CmdResult::FAILURE;
 		}
 		else
 		{
-			user->ChangeRealUser(parameters[0], true);
-			user->ChangeRealName(parameters[3]);
+			user->ChangeRealUser(newuser, true);
+			user->ChangeRealName(newreal);
 			user->connected |= User::CONN_USER;
 		}
 	}

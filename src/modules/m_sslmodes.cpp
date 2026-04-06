@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2013, 2017-2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2013, 2017-2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2013 Shawn Smith <ShawnSmith0828@gmail.com>
  *   Copyright (C) 2012-2013 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
@@ -48,6 +48,8 @@ private:
 	UserCertificateAPI& sslapi;
 
 public:
+	bool operonly;
+
 	FingerprintExtBan(Module* Creator, UserCertificateAPI& api)
 		: ExtBan::MatchingBase(Creator, "fingerprint", 'z')
 		, sslapi(api)
@@ -65,6 +67,17 @@ public:
 				return true;
 		}
 		return false;
+	}
+
+	bool Validate(ListModeBase* lm, LocalUser* user, Channel* channel, std::string& text) override
+	{
+		if (operonly && !user->IsOper())
+		{
+			// XXX: this has to match the check in sslinfo.
+			user->WriteNumeric(ERR_NOPRIVILEGES, "Permission Denied - You do not have the required operator privileges");
+			return false;
+		}
+		return true;
 	}
 };
 
@@ -175,6 +188,13 @@ public:
 		, sslquery(this, api)
 		, extban(this, api)
 	{
+	}
+
+	void ReadConfig(ConfigStatus& status) override
+	{
+		const auto fpvisible = ServerInstance->Config->ConfValue("sslmodes")->getBool("operonly");
+		const auto& tag = ServerInstance->Config->ConfValue("sslmodes");
+		extban.operonly = tag->getBool("extbanoperonly", fpvisible);
 	}
 
 	ModResult OnUserPreJoin(LocalUser* user, Channel* chan, const std::string& cname, std::string& privs, const std::string& keygiven, bool override) override

@@ -3,7 +3,7 @@
  *
  *   Copyright (C) 2019 iwalkalone <iwalkalone69@gmail.com>
  *   Copyright (C) 2012-2016, 2018 Attila Molnar <attilamolnar@hush.com>
- *   Copyright (C) 2012-2013, 2017-2025 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2012-2013, 2017-2026 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
  *   Copyright (C) 2008 Thomas Stagner <aquanight@gmail.com>
@@ -47,7 +47,13 @@ enum ModuleFlags
 	VF_COMMON = 4,
 
 	/** The module SHOULD be loaded on all servers on a network for consistency. */
-	VF_OPTCOMMON = 8
+	VF_OPTCOMMON = 8,
+
+	/** The module is deprecated and will be removed in the next version of InspIRCd. */
+	VF_DEPRECATED = 16,
+
+	/** Alias for the last vendor flag. Do not use this in module properties as it may change. */
+	VF_LAST = VF_DEPRECATED,
 };
 
 /** The event was explicitly allowed. */
