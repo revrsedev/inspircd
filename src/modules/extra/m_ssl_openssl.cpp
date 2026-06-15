@@ -4,7 +4,7 @@
  *   Copyright (C) 2021 Dominic Hamon
  *   Copyright (C) 2020 Matt Schatz <genius3000@g3k.solutions>
  *   Copyright (C) 2017, 2023 Wade Cline <wadecline@hotmail.com>
- *   Copyright (C) 2014, 2016-2017, 2019-2025 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2014, 2016-2017, 2019-2025 Sadie Powell <sadie@sadiepowell.dev>
  *   Copyright (C) 2014 Julien Vehent <julien@linuxwall.info>
  *   Copyright (C) 2012-2017 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
@@ -685,7 +685,7 @@ private:
 		X509_free(cert);
 	}
 
-	static void GetDNString(X509_NAME* x509name, std::string& out)
+	static void GetDNString(const X509_NAME* x509name, std::string& out)
 	{
 		char buf[512];
 		X509_NAME_oneline(x509name, buf, sizeof(buf));
@@ -695,7 +695,7 @@ private:
 			out[pos] = ' ';
 	}
 
-	static time_t GetTime(ASN1_TIME* x509time)
+	static time_t GetTime(const ASN1_TIME* x509time)
 	{
 		if (!x509time)
 			return 0;

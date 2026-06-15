@@ -4,7 +4,7 @@
  *   Copyright (C) 2021 Herman <GermanAizek@yandex.ru>
  *   Copyright (C) 2016 Adam <Adam@anope.org>
  *   Copyright (C) 2014 Mantas Mikulėnas <grawity@gmail.com>
- *   Copyright (C) 2013, 2017-2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2013, 2017-2024 Sadie Powell <sadie@sadiepowell.dev>
  *   Copyright (C) 2013, 2015-2016, 2018 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2013 Daniel Vassdal <shutter@canternet.org>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
@@ -272,6 +272,15 @@ public:
 		this->result = SASL_ABORT;
 	}
 
+	void NotifyAbort()
+	{
+		if (this->state == SASL_DONE)
+			return;
+
+		SendSASL(this->user, this->agent.empty() ? "*" : this->agent, 'D', { "A" });
+		this->state = SASL_DONE;
+	}
+
 	bool SendClientMessage(const std::vector<std::string>& parameters)
 	{
 		if (this->state != SASL_COMM)
@@ -461,6 +470,13 @@ public:
 			saslauth->AnnounceState();
 			authExt.Unset(user);
 		}
+	}
+
+	void OnUserDisconnect(LocalUser* user) override
+	{
+		SaslAuthenticator* saslauth = authExt.Get(user);
+		if (saslauth)
+			saslauth->NotifyAbort();
 	}
 
 	void OnDecodeMetadata(Extensible* target, const std::string& extname, const std::string& extdata) override

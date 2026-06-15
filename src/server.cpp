@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2020-2025 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2020-2025 Sadie Powell <sadie@sadiepowell.dev>
  *   Copyright (C) 2013-2014 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2012 ChrisTX <xpipe@hotmail.de>
@@ -23,6 +23,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+#ifndef _WIN32
+# include <unistd.h>
+#endif
 
 #include "inspircd.h"
 
@@ -55,6 +59,11 @@ void InspIRCd::Exit(int status)
 	this->Cleanup();
 	ServerInstance = nullptr;
 	delete this;
+	if (isatty(fileno(stdout)))
+	{
+		fmt::println("");
+		fmt::println("Exiting with code {}.", status);
+	}
 	exit(status);
 }
 

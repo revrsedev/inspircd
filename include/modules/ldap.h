@@ -1,7 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2020-2022 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2020-2022, 2026 Sadie Powell <sadie@sadiepowell.dev>
  *   Copyright (C) 2013, 2015 Adam <Adam@anope.org>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
@@ -47,6 +47,8 @@ struct LDAPModification final
 };
 
 typedef std::vector<LDAPModification> LDAPMods;
+
+using LDAPAttribute = std::pair<std::string, std::string>;
 
 struct LDAPAttributes final
 	: public std::map<std::string, std::vector<std::string>>
@@ -191,4 +193,15 @@ public:
 	 * @param val value to compare attr of dn
 	 */
 	virtual void Compare(LDAPInterface* i, const std::string& dn, const std::string& attr, const std::string& val) = 0;
+
+	/** Escapes a LDAP string for use in a DN.
+	 * @param str The string to escape.
+	 */
+	virtual std::string EscapeDN(const std::string& str) const = 0;
+
+	/** Escapes a LDAP string for use in a search filter.
+	 * @param str The string to escape.
+	 */
+	virtual std::string EscapeSF(const std::string& str) const = 0;
+
 };

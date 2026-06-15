@@ -2,7 +2,7 @@
  * InspIRCd -- Internet Relay Chat Daemon
  *
  *   Copyright (C) 2021 Dominic Hamon
- *   Copyright (C) 2017-2018, 2021-2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2017-2018, 2021-2024 Sadie Powell <sadie@sadiepowell.dev>
  *   Copyright (C) 2017 Robin Burchell <robin+git@viroteck.net>
  *   Copyright (C) 2013-2014 Adam <Adam@anope.org>
  *   Copyright (C) 2012, 2014-2015 Attila Molnar <attilamolnar@hush.com>
@@ -70,7 +70,7 @@ void EventHandler::OnEventHandlerError(int errornum)
 
 void SocketEngine::InitError()
 {
-	fmt::println(stderr, "{} Socket engine initialization failed. {}.", fmt::styled("FATAL ERROR!", fmt::emphasis::bold | fmt::fg(fmt::terminal_color::red)), strerror(errno));
+	fmt::println(stderr, "{} Socket engine initialization failed. {}.", fmt::styled("Error!", fmt::emphasis::bold | fmt::fg(fmt::terminal_color::red)), strerror(errno));
 	exit(EXIT_FAILURE);
 }
 

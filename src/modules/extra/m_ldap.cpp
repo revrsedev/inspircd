@@ -4,7 +4,7 @@
  *   Copyright (C) 2021 Dominic Hamon
  *   Copyright (C) 2020 Joel Sing <joel@sing.id.au>
  *   Copyright (C) 2019 linuxdaemon <linuxdaemon.irc@gmail.com>
- *   Copyright (C) 2016-2017, 2019-2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2016-2017, 2019-2024, 2026 Sadie Powell <sadie@sadiepowell.dev>
  *   Copyright (C) 2014 Attila Molnar <attilamolnar@hush.com>
  *   Copyright (C) 2013-2015 Adam <Adam@anope.org>
  *
@@ -463,6 +463,80 @@ public:
 	void Compare(LDAPInterface* i, const std::string& dn, const std::string& attr, const std::string& val) override
 	{
 		QueueRequest(new LDAPCompare(this, i, dn, attr, val));
+	}
+
+	std::string EscapeDN(const std::string& str) const override
+	{
+		if (str.empty())
+			return str;
+
+		std::string newstr;
+		newstr.reserve(str.length());
+		for (size_t idx = 0; idx < str.length(); ++idx)
+		{
+			const char chr = str[idx];
+			if (chr == '\0')
+			{
+				newstr.append("\\00");
+			}
+			else if (chr == '"'  || chr == '+' || chr == ',' || chr == ';' ||
+				chr == '<'  || chr == '=' || chr == '>' || chr == '\\')
+			{
+				newstr.push_back('\\');
+				newstr.push_back(chr);
+			}
+			else if (idx == 0 && (chr == '#' || chr == ' '))
+			{
+				newstr.push_back('\\');
+				newstr.push_back(chr);
+			}
+			else if (idx == str.length() - 1 && chr == ' ')
+			{
+				newstr.push_back('\\');
+				newstr.push_back(chr);
+			}
+			else
+			{
+				newstr.push_back(chr);
+			}
+		}
+
+		return newstr;
+	}
+
+	std::string EscapeSF(const std::string& str) const override
+	{
+		if (str.empty())
+			return str;
+
+		std::string newstr;
+		newstr.reserve(str.length());
+		for (size_t idx = 0; idx < str.length(); ++idx)
+		{
+			const char chr = str[idx];
+			switch (chr)
+			{
+				case '\0':
+					newstr.append("\\00");
+					break;
+				case '(':
+					newstr.append("\\28");
+					break;
+				case ')':
+					newstr.append("\\29");
+					break;
+				case '*':
+					newstr.append("\\2A");
+					break;
+				case '\\':
+					newstr.append("\\5C");
+					break;
+				default:
+					newstr.push_back(chr);
+					break;
+			}
+		}
+		return newstr;
 	}
 
 private:

@@ -3,7 +3,7 @@
  *
  *   Copyright (C) 2019 linuxdaemon <linuxdaemon.irc@gmail.com>
  *   Copyright (C) 2013-2015 Attila Molnar <attilamolnar@hush.com>
- *   Copyright (C) 2013, 2017-2024 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2013, 2017-2024 Sadie Powell <sadie@sadiepowell.dev>
  *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
  *   Copyright (C) 2007 Dennis Friis <peavey@inspircd.org>
@@ -142,6 +142,7 @@ public:
 
 	bool IsMatch(User* user, Channel* channel, const std::string& text) override
 	{
+		// Try to glob match against a nickname in the nick group.
 		const auto* nicks = accountapi.GetAccountNicks(user);
 		if (nicks)
 		{
@@ -152,8 +153,14 @@ public:
 			}
 		}
 
+		// Try to glob match against the account name.
 		const auto* account = accountapi.GetAccountName(user);
-		return account && InspIRCd::Match(*account, text);
+		if (account && InspIRCd::Match(*account, text))
+			return true;
+
+		// Try to literal match against the account identifier.
+		const auto* accountid = accountapi.GetAccountId(user);
+		return accountid && InspIRCd::Match(*accountid, text);
 	}
 };
 
